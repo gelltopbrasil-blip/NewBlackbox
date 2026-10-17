@@ -11,8 +11,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: Instalar NDK
-        run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;29.0.13846066"
+      - name: Aceitar licencas e instalar NDK
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;29.0.13846066"
       - name: Compilar
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
