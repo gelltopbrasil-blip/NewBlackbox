@@ -355,6 +355,88 @@ public class BActivityThread extends IBActivityThread.Stub {
         }
     }
 
+    /** Troca Build.* deste processo virtual pelo preset da instância (userId). */
+    private void applyInstanceBuild() {
+        try {
+            // Congela a detecção de Xiaomi/MIUI com o aparelho real, senão os workarounds mudam com o spoof.
+            top.niunaijun.blackbox.util.XiaomiDeviceDetector.lockRealDevice();
+        } catch (Throwable ignored) {
+        }
+        try {
+            top.niunaijun.blackbox.utils.DeviceProfile p = top.niunaijun.blackbox.utils.DeviceProfile.get(getUserId());
+            setBuildField("BRAND", p.brand);
+            setBuildField("MANUFACTURER", p.manufacturer);
+            setBuildField("MODEL", p.model);
+            setBuildField("DEVICE", p.device);
+            setBuildField("PRODUCT", p.product);
+            setBuildField("BOARD", p.board);
+            setBuildField("HARDWARE", p.hardware);
+            setBuildField("FINGERPRINT", p.fingerprint);
+            setBuildField("SERIAL", p.serial);
+
+            // getprop nativo (__system_property_get) coerente com Build.*
+            java.util.ArrayList<String> kv = new java.util.ArrayList<>();
+            for (String scope : new String[]{"", "system.", "vendor."}) {
+                addProp(kv, "ro.product." + scope + "model", p.model);
+                addProp(kv, "ro.product." + scope + "brand", p.brand);
+                addProp(kv, "ro.product." + scope + "manufacturer", p.manufacturer);
+                addProp(kv, "ro.product." + scope + "device", p.device);
+                addProp(kv, "ro.product." + scope + "name", p.product);
+            }
+            addProp(kv, "ro.product.board", p.board);
+            addProp(kv, "ro.hardware", p.hardware);
+            addProp(kv, "ro.boot.hardware", p.hardware);
+            addProp(kv, "ro.build.fingerprint", p.fingerprint);
+            addProp(kv, "ro.system.build.fingerprint", p.fingerprint);
+            addProp(kv, "ro.vendor.build.fingerprint", p.fingerprint);
+            addProp(kv, "ro.serialno", p.serial);
+            addProp(kv, "ro.boot.serialno", p.serial);
+            top.niunaijun.blackbox.core.NativeCore.setSystemProps(kv.toArray(new String[0]));
+        } catch (Throwable t) {
+            Slog.w(TAG, "applyInstanceBuild failed", t);
+        }
+    }
+
+    private static void addProp(java.util.List<String> kv, String key, String value) {
+        if (value == null || value.isEmpty()) return;
+        kv.add(key);
+        kv.add(value);
+    }
+
+    private static void setBuildField(String name, String value) {
+        if (value == null || value.isEmpty()) return;
+        try {
+            java.lang.reflect.Field f = Build.class.getDeclaredField(name);
+            f.setAccessible(true);
+            f.set(null, value);
+        } catch (Throwable t) {
+            Slog.w(TAG, "Build." + name + " not set: " + t);
+        }
+    }
+
+    /** Aplica o proxy configurado para esta instância (userId) nas propriedades da JVM do processo virtual. */
+    private void applyInstanceProxy() {
+        try {
+            top.niunaijun.blackbox.utils.DeviceProfile p = top.niunaijun.blackbox.utils.DeviceProfile.get(getUserId());
+            for (String k : new String[]{"http.proxyHost", "http.proxyPort", "https.proxyHost", "https.proxyPort",
+                    "socksProxyHost", "socksProxyPort"}) {
+                System.clearProperty(k);
+            }
+            if (!p.hasProxy()) return;
+            if ("socks".equalsIgnoreCase(p.proxyType)) {
+                System.setProperty("socksProxyHost", p.proxyHost);
+                System.setProperty("socksProxyPort", String.valueOf(p.proxyPort));
+            } else {
+                System.setProperty("http.proxyHost", p.proxyHost);
+                System.setProperty("http.proxyPort", String.valueOf(p.proxyPort));
+                System.setProperty("https.proxyHost", p.proxyHost);
+                System.setProperty("https.proxyPort", String.valueOf(p.proxyPort));
+            }
+        } catch (Throwable t) {
+            Slog.w(TAG, "applyInstanceProxy failed", t);
+        }
+    }
+
     public synchronized void handleBindApplication(String packageName, String processName) {
         if (isInit())
             return;
@@ -399,6 +481,8 @@ public class BActivityThread extends IBActivityThread.Stub {
             BRCompatibility.get().setTargetSdkVersion(applicationInfo.targetSdkVersion);
         }
 
+        applyInstanceProxy();
+        applyInstanceBuild();
         NativeCore.init(Build.VERSION.SDK_INT);
         assert packageContext != null;
         IOCore.get().enableRedirect(packageContext);

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_identity">Identidade do dispositivo</string>
+    <string name="identity_title">Identidade do dispositivo (instância %1$d)</string>
+    <string name="identity_regen">Gerar novos IDs</string>
+    <string name="identity_proxy">Proxy de rede (vazio = sem proxy)</string>
+    <string name="identity_proxy_host">Host / IP</string>
+    <string name="identity_proxy_port">Porta</string>
+    <string name="identity_save">Salvar e reiniciar apps</string>
+    <string name="identity_saved">Salvo. Os apps desta instância foram parados; abra-os de novo.</string>
+    <string name="identity_invalid_proxy">Proxy inválido: informe host e porta (1-65535)</string>
+    <string name="identity_model">Modelo do aparelho (usado ao gerar novos IDs)</string>
+    <string name="identity_random">Aleatório</string>
+    <string name="identity_invalid_field">Valor inválido no campo: %1$s</string>
+    <string name="identity_luhn_warn">O IMEI não passa na verificação Luhn (mantido como digitado)</string>
+</resources>

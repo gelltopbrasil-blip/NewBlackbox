@@ -356,6 +356,10 @@ class AppsFragment : Fragment() {
                                         stopApk(data)
                                     }
 
+                                    R.id.app_identity -> {
+                                        DeviceIdentityDialog.show(requireContext(), userID)
+                                    }
+
                                     R.id.app_shortcut -> {
                                         ShortcutUtil.createShortcut(requireContext(), userID, data)
                                     }

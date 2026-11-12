@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import top.niunaijun.blackbox.fake.hook.ClassInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
+import top.niunaijun.blackbox.app.BActivityThread;
+import top.niunaijun.blackbox.utils.DeviceProfile;
 import top.niunaijun.blackbox.utils.Slog;
 
 
@@ -157,21 +159,12 @@ public class AndroidIdProxy extends ClassInvocationStub {
     }
 
     
+    // Android ID estável e único por instância (userId virtual)
     private static String generateMockAndroidId() {
-        
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            sb.append(Integer.toHexString((int) (Math.random() * 16)));
-        }
-        String mockId = sb.toString().toUpperCase();
-        Slog.d(TAG, "AndroidId: Generated mock Android ID: " + mockId);
-        return mockId;
+        return DeviceProfile.get(BActivityThread.getUserId()).androidId;
     }
 
     private static Long generateMockAndroidIdLong() {
-        
-        long mockId = (long) (Math.random() * Long.MAX_VALUE);
-        Slog.d(TAG, "AndroidId: Generated mock Android ID long: " + mockId);
-        return mockId;
+        return new java.math.BigInteger(DeviceProfile.get(BActivityThread.getUserId()).androidId, 16).longValue();
     }
 }

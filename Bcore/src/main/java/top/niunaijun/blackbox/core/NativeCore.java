@@ -28,6 +28,9 @@ public class NativeCore {
 
     public static native void init(int apiLevel);
 
+    /** Define propriedades de sistema (getprop nativo) deste processo: {chave1, valor1, chave2, valor2, ...}. */
+    public static native void setSystemProps(String[] keyValues);
+
     public static native void enableIO();
 
     public static native void addIORule(String targetPath, String relocatePath);

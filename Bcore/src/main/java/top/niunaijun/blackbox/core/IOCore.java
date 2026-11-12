@@ -145,6 +145,7 @@ public class IOCore {
                 hideRoot(rule);
             }
             proc(rule);
+            identityFiles(rule);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -168,6 +169,54 @@ public class IOCore {
         rule.put("/system/bin/failsafe/su", "/system/bin/failsafe/su-fake");
         rule.put("/data/local/su", "/data/local/su-fake");
         rule.put("/su/bin/su", "/su/bin/su-fake");
+    }
+
+    /** Arquivos falsos por instância: /proc/cpuinfo (linha Hardware) e MAC do wlan0 (só onde o app real conseguiria ler). */
+    private void identityFiles(Map<String, String> rule) {
+        try {
+            int userId = top.niunaijun.blackbox.app.BActivityThread.getUserId();
+            top.niunaijun.blackbox.utils.DeviceProfile p = top.niunaijun.blackbox.utils.DeviceProfile.get(userId);
+            File dir = new File(BEnvironment.getVirtualRoot(), "identity/" + userId);
+            FileUtils.mkdirs(dir.getAbsolutePath());
+
+            if (p.chip != null && !p.chip.isEmpty()) {
+                File out = new File(dir, "cpuinfo");
+                writeText(out, buildCpuInfo(p.chip));
+                rule.put("/proc/cpuinfo", out.getAbsolutePath());
+            }
+            // Android 11+ nega leitura desse arquivo a apps comuns: não expor onde um aparelho real negaria.
+            if (android.os.Build.VERSION.SDK_INT < 30 && p.wifiMac != null && !p.wifiMac.isEmpty()) {
+                File out = new File(dir, "wlan0_address");
+                writeText(out, p.wifiMac + "\n");
+                rule.put("/sys/class/net/wlan0/address", out.getAbsolutePath());
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    private static String buildCpuInfo(String chip) throws java.io.IOException {
+        StringBuilder sb = new StringBuilder();
+        boolean replaced = false;
+        try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader("/proc/cpuinfo"))) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                if (line.matches("^Hardware\\s*:.*")) {
+                    sb.append("Hardware\t: ").append(chip).append('\n');
+                    replaced = true;
+                } else {
+                    sb.append(line).append('\n');
+                }
+            }
+        }
+        if (!replaced) sb.append("Hardware\t: ").append(chip).append('\n');
+        return sb.toString();
+    }
+
+    private static void writeText(File f, String text) throws java.io.IOException {
+        try (java.io.FileOutputStream o = new java.io.FileOutputStream(f, false)) {
+            o.write(text.getBytes("UTF-8"));
+        }
     }
 
     private void proc(Map<String, String> rule) {

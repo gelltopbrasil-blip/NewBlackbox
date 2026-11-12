@@ -63,6 +63,17 @@ public class SystemProviderStub extends ClassInvocationStub implements BContentP
                     }
                 }
             }
+            // Settings.Secure.ANDROID_ID por instância: call("GET_secure", "android_id")
+            if (args != null) {
+                for (int i = 0; i < args.length - 1; i++) {
+                    if ("GET_secure".equals(args[i]) && "android_id".equals(args[i + 1])) {
+                        android.os.Bundle b = new android.os.Bundle();
+                        b.putString("value", top.niunaijun.blackbox.utils.DeviceProfile
+                                .get(top.niunaijun.blackbox.app.BActivityThread.getUserId()).androidId);
+                        return b;
+                    }
+                }
+            }
             return method.invoke(mBase, args);
         }
         

@@ -18,7 +18,7 @@ import top.niunaijun.blackbox.fake.frameworks.BLocationManager;
 import top.niunaijun.blackbox.fake.hook.BinderInvocationStub;
 import top.niunaijun.blackbox.fake.hook.MethodHook;
 import top.niunaijun.blackbox.fake.hook.ProxyMethod;
-import top.niunaijun.blackbox.utils.Md5Utils;
+import top.niunaijun.blackbox.utils.DeviceProfile;
 
 
 public class ITelephonyManagerProxy extends BinderInvocationStub {
@@ -48,9 +48,7 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class GetDeviceId extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-
-
-            return Md5Utils.md5(BlackBoxCore.getHostPkg());
+            return DeviceProfile.get(BActivityThread.getUserId()).imei;
         }
     }
 
@@ -58,9 +56,9 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class getImeiForSlot extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-
-
-            return Md5Utils.md5(BlackBoxCore.getHostPkg());
+            DeviceProfile p = DeviceProfile.get(BActivityThread.getUserId());
+            int slot = (args != null && args.length > 0 && args[0] instanceof Integer) ? (Integer) args[0] : 0;
+            return slot == 1 ? p.imei2 : p.imei;
         }
     }
 
@@ -68,9 +66,7 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class GetMeidForSlot extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-
-
-            return Md5Utils.md5(BlackBoxCore.getHostPkg());
+            return DeviceProfile.get(BActivityThread.getUserId()).meid;
         }
     }
 
@@ -95,7 +91,7 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class GetSubscriberId extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return Md5Utils.md5(BlackBoxCore.getHostPkg());
+            return DeviceProfile.get(BActivityThread.getUserId()).imsi;
         }
     }
 
@@ -103,7 +99,7 @@ public class ITelephonyManagerProxy extends BinderInvocationStub {
     public static class GetDeviceIdWithFeature extends MethodHook {
         @Override
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
-            return Md5Utils.md5(BlackBoxCore.getHostPkg());
+            return DeviceProfile.get(BActivityThread.getUserId()).imei;
         }
     }
 

@@ -73,4 +73,17 @@
     <string name="disable_gms">Disable Service</string>
     <string name="disable_gms_hint">Clear the current Google service environment? Google service data will be cleared.</string>
     <string name="no_gms">Currently, there is no Google service environment on mobile phones.</string>
+    <string name="app_identity">Device identity</string>
+    <string name="identity_title">Device identity (instance %1$d)</string>
+    <string name="identity_regen">Generate new IDs</string>
+    <string name="identity_proxy">Network proxy (empty = none)</string>
+    <string name="identity_proxy_host">Host / IP</string>
+    <string name="identity_proxy_port">Port</string>
+    <string name="identity_save">Save and restart apps</string>
+    <string name="identity_saved">Saved. Apps of this instance were stopped; reopen them.</string>
+    <string name="identity_invalid_proxy">Invalid proxy: fill host and port (1-65535)</string>
+    <string name="identity_model">Device model (used when generating new IDs)</string>
+    <string name="identity_random">Random</string>
+    <string name="identity_invalid_field">Invalid value in field: %1$s</string>
+    <string name="identity_luhn_warn">IMEI fails the Luhn check (kept as typed)</string>
 </resources>

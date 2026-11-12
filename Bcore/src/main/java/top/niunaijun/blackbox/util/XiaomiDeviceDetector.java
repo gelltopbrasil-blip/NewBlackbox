@@ -30,7 +30,21 @@ public class XiaomiDeviceDetector {
     private static int sAndroidVersion = 0;
     
     
+    private static Boolean sLockedReal = null;
+
+    /** Congela a detecção usando o aparelho REAL; chamar antes de qualquer spoof de Build.*. */
+    public static void lockRealDevice() {
+        if (sLockedReal != null) return;
+        boolean real = isXiaomiDevice();
+        getMiuiVersion();
+        getDeviceModel();
+        sLockedReal = real;
+    }
+
     public static boolean isXiaomiDevice() {
+        if (sLockedReal != null) {
+            return sLockedReal;
+        }
         if (sIsXiaomiDevice) {
             return true;
         }

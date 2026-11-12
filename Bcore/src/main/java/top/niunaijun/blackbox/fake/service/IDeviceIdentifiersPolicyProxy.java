@@ -39,7 +39,7 @@ public class IDeviceIdentifiersPolicyProxy extends BinderInvocationStub {
         protected Object hook(Object who, Method method, Object[] args) throws Throwable {
 
 
-            return Md5Utils.md5(BlackBoxCore.getHostPkg());
+            return top.niunaijun.blackbox.utils.DeviceProfile.get(top.niunaijun.blackbox.app.BActivityThread.getUserId()).serial;
         }
     }
 }

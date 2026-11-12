@@ -131,7 +131,29 @@ bool disableResourceLoading(JNIEnv *env, jclass clazz) {
     return true;
 }
 
+extern void spoof_set_prop(const char *key, const char *value);
+
+// kv = {chave1, valor1, chave2, valor2, ...}
+void setSystemProps(JNIEnv *env, jclass clazz, jobjectArray kv) {
+    if (kv == nullptr) return;
+    jsize n = env->GetArrayLength(kv);
+    for (jsize i = 0; i + 1 < n; i += 2) {
+        jstring k = (jstring) env->GetObjectArrayElement(kv, i);
+        jstring v = (jstring) env->GetObjectArrayElement(kv, i + 1);
+        if (k != nullptr && v != nullptr) {
+            const char *ck = env->GetStringUTFChars(k, nullptr);
+            const char *cv = env->GetStringUTFChars(v, nullptr);
+            if (ck && cv) spoof_set_prop(ck, cv);
+            if (ck) env->ReleaseStringUTFChars(k, ck);
+            if (cv) env->ReleaseStringUTFChars(v, cv);
+        }
+        if (k) env->DeleteLocalRef(k);
+        if (v) env->DeleteLocalRef(v);
+    }
+}
+
 static JNINativeMethod gMethods[] = {
+        {"setSystemProps", "([Ljava/lang/String;)V",              (void *) setSystemProps},
         {"disableHiddenApi", "()Z",                               (void *) disableHiddenApi},
         {"disableResourceLoading", "()Z",                         (void *) disableResourceLoading},
         {"hideXposed", "()V",                                     (void *) hideXposed},
