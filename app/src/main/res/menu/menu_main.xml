@@ -4,6 +4,21 @@
 
 
     <item
+            android:id="@+id/main_import_apk"
+            android:title="@string/import_apk"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/main_background"
+            android:title="@string/background_mode"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/main_stop_running"
+            android:title="@string/stop_running"
+            app:showAsAction="never" />
+
+    <item
             android:id="@+id/main_setting"
             android:title="@string/setting"
             app:showAsAction="never" />

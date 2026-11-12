@@ -7,6 +7,10 @@
         tools:ignore="QueryAllPackagesPermission" />
 
     
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
@@ -26,6 +30,14 @@
         <activity
             android:name=".view.fake.FollowMyLocationOverlay"
             android:exported="false" />
+        <service
+            android:name=".service.KeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Mantém as instâncias virtuais ativas em segundo plano" />
+        </service>
         <activity android:name=".view.setting.SettingActivity" />
         <activity android:name=".view.gms.GmsManagerActivity" />
         <activity

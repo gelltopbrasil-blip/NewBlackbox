@@ -17,6 +17,12 @@
     <string name="close_app_fake_location">Disable FakeLocation for %s</string>
     <string name="close_fake_location_success">Disable FakeLocation for %s Successfully</string>
     <string name="setting">Setting</string>
+    <string name="import_apk">Importar APK</string>
+    <string name="keepalive_running">Instâncias ativas em segundo plano</string>
+    <string name="keepalive_stop">Parar</string>
+    <string name="background_mode">Modo segundo plano</string>
+    <string name="stop_running">Encerrar apps em execução (esta instância)</string>
+    <string name="stop_running_result">%1$d app(s) encerrado(s) para liberar memória</string>
     <string name="jump_module">Go to Module Manager</string>
     <string name="module_setting">Module Manager</string>
     <string name="enable_xposed">Enable Xposed Framework</string>

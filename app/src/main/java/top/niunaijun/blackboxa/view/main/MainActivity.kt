@@ -322,6 +322,11 @@ class MainActivity : LoadingActivity() {
                     Log.e(TAG, "Error launching ListActivity: ${e.message}")
                 }
             }
+            // Toque longo no botão "+" abre direto o seletor de APK
+            viewBinding.fab.setOnLongClickListener {
+                pickApk()
+                true
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error in initFab: ${e.message}")
         }
@@ -372,6 +377,47 @@ class MainActivity : LoadingActivity() {
         }
     }
 
+    /** Seletor direto de APK (pula a lista de apps instalados). */
+    private val importApkResult =
+            registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+                try {
+                    if (uri != null) {
+                        val userId = viewBinding.viewPager.currentItem
+                        fragmentList[userId].installApk(uri.toString())
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error importing APK: ${e.message}")
+                }
+            }
+
+    /** Encerra os apps virtuais em execução da instância para liberar RAM. */
+    private fun stopRunningApps(userId: Int) {
+        Thread {
+            var stopped = 0
+            try {
+                val core = BlackBoxCore.get()
+                for (info in core.getInstalledApplications(0, userId)) {
+                    if (BlackBoxCore.isRunningApplication(info.packageName, userId)) {
+                        core.stopPackage(info.packageName, userId)
+                        stopped++
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error stopping apps: ${e.message}")
+            }
+            runOnUiThread {
+                android.widget.Toast.makeText(
+                    this, getString(R.string.stop_running_result, stopped),
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }.start()
+    }
+
+    private fun pickApk() {
+        importApkResult.launch("application/vnd.android.package-archive")
+    }
+
     private val apkPathResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 try {
@@ -409,6 +455,18 @@ class MainActivity : LoadingActivity() {
                                     Uri.parse("https://github.com/ALEX5402/NewBlackbox")
                             )
                     startActivity(intent)
+                }
+                R.id.main_background -> {
+                    top.niunaijun.blackboxa.service.KeepAliveService.start(this)
+                    if (top.niunaijun.blackboxa.service.KeepAliveService.isBatteryOptimized(this)) {
+                        top.niunaijun.blackboxa.service.KeepAliveService.requestBatteryExemption(this)
+                    }
+                }
+                R.id.main_stop_running -> {
+                    stopRunningApps(viewBinding.viewPager.currentItem)
+                }
+                R.id.main_import_apk -> {
+                    pickApk()
                 }
                 R.id.main_setting -> {
                     SettingActivity.start(this)
